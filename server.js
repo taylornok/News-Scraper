@@ -2,7 +2,7 @@
 var cheerio = require("cheerio");
 // Makes HTTP request for HTML page
 var request = require("request");
-var sourceURL = "https://old.reddit.com/r/explainlikeimfive/"
+var sourceURL = "https://old.reddit.com/r/explainlikeimfive";
 
 // First, tell the console what server.js is doing
 console.log("\n***********************************\n" +
@@ -30,6 +30,7 @@ request(sourceURL, function(error, response, html) {
     // In the currently selected element, look at its child elements (i.e., its a-tags),
     // then save the values for any "href" attributes that the child elements may have
     var linkSrc = $(element).find("a").attr("data-href-url");
+    sourceURL = "https://old.reddit.com/"
     sourceURL = sourceURL.slice(0, -1);
     var link = sourceURL + linkSrc
 
