@@ -1,46 +1,43 @@
 // Parses our HTML and helps us find elements
-var cheerio = require("cheerio");
+const cheerio = require("cheerio");
 // Makes HTTP request for HTML page
-var request = require("request");
-var sourceURL = "https://old.reddit.com/r/explainlikeimfive";
+const request = require("request");
+
+let sourceURL = "https://www.nytimes.com/section/us"
 
 // First, tell the console what server.js is doing
 console.log("\n***********************************\n" +
-            "Grabbing every thread name and link\n" +
-            "from reddit's 'Explain Like I'm 5' board:" +
+            "Grabbing latest news from the New York Times\n" +
             "\n***********************************\n");
-
-// Making a request for reddit's "webdev" board. The page's HTML is passed as the callback's third argument
 request(sourceURL, function(error, response, html) {
-
+   
   // Load the HTML into cheerio and save it to a variable
-  // '$' becomes a shorthand for cheerio's selector commands, much like jQuery's '$'
-  var $ = cheerio.load(html);
+  const $ = cheerio.load(html);
+  // Make an empty array for the results from the page
+  let results = [];
 
-  // An empty array to save the data that we'll scrape
-  var results = [];
+ // Go through each div on the page with a 'story-body' tag
+  $("div.story-body").each(function(i, element){
+     // Take link from child anchor tag
+      let storyLink = $(element).find("a").attr("href");
+        // For the headline
+      $("h2.headline").each(function(i, element){
+        let headline = $(element).text().trim();
+        
+        // To grab the summary
+        $("p.summary").each(function(i, element) {
+            let summary = $(element).text().trim();
 
-  // With cheerio, find each p-tag with the "title" class
-  // (i: iterator. element: the current element)
-  $("p.title").each(function(i, element) {
+            results.push({
+                headline: headline,
+                summary: summary,
+                url: storyLink
+            })
+        })
 
-    // Save the text of the element in a "title" variable
-    var title = $(element).text();
+      })
+    })
+    
+  console.log(results)
 
-    // In the currently selected element, look at its child elements (i.e., its a-tags),
-    // then save the values for any "href" attributes that the child elements may have
-    var linkSrc = $(element).find("a").attr("data-href-url");
-    sourceURL = "https://old.reddit.com/"
-    sourceURL = sourceURL.slice(0, -1);
-    var link = sourceURL + linkSrc
-
-    // Save these results in an object that we'll push into the results array we defined earlier
-    results.push({
-      title: title,
-      link: link
-    });
-  });
-
-  // Log the results once you've looped through each of the elements found with cheerio
-  console.log(results);
-});
+})
